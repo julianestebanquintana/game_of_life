@@ -21,6 +21,9 @@ dim_y = height/cells_y
 # Matrix for keeping the state of the game. Alive=1, death=0.
 game_state = np.zeros((cells_x, cells_y))
 
+# Game execution control
+pause_exec = False
+
 # Execution loop
 while True:
     # Reinitializing screen and game state in every iteration
@@ -28,30 +31,40 @@ while True:
     screen.fill(background)
     time.sleep(0.1)
 
+    # Registering keyboard and mouse events
+    ev = pygame.event.get()
+
+    for event in ev:
+        if event.type == pygame.KEYDOWN:
+            pause_exec = not pause_exec
+
+
     for y in range(0, cells_x):
         for x in range(0, cells_y):
 
-            # Calculating close neighbors
-            n_neigh = (
-                    game_state[(x - 1) % cells_x, (y - 1) % cells_y]
-                    + game_state[x % cells_x, (y - 1) % cells_y]
-                    + game_state[(x + 1) % cells_x, (y - 1) % cells_y]
-                    + game_state[(x - 1) % cells_x, y % cells_y]
-                    + game_state[(x + 1) % cells_x, y % cells_y]
-                    + game_state[(x - 1) % cells_x, (y + 1) % cells_y]
-                    + game_state[x % cells_x, (y + 1) % cells_y]
-                    + game_state[(x + 1) % cells_x, (y + 1) % cells_y]
-                )
+            if not pause_exec:
 
-            # Rule #1: One death cell with 3 alive neighbors, gets back to life
-            if game_state[x, y] == 0 and n_neigh == 3:
-                new_game_state[x, y] = 1
+                # Calculating close neighbors
+                n_neigh = (
+                        game_state[(x - 1) % cells_x, (y - 1) % cells_y]
+                        + game_state[x % cells_x, (y - 1) % cells_y]
+                        + game_state[(x + 1) % cells_x, (y - 1) % cells_y]
+                        + game_state[(x - 1) % cells_x, y % cells_y]
+                        + game_state[(x + 1) % cells_x, y % cells_y]
+                        + game_state[(x - 1) % cells_x, (y + 1) % cells_y]
+                        + game_state[x % cells_x, (y + 1) % cells_y]
+                        + game_state[(x + 1) % cells_x, (y + 1) % cells_y]
+                    )
 
-            # Rule #2: One cell alive, dies if it has less than 2 alive
-            # neighbors (loneliness) or if it has more than 3 alive neighbors
-            # (overpopulation)
-            elif game_state[x, y] == 1 and (n_neigh < 2 or n_neigh > 3):
-                new_game_state[x, y] = 0
+                # Rule #1: One death cell with 3 alive neighbors, gets back to life
+                if game_state[x, y] == 0 and n_neigh == 3:
+                    new_game_state[x, y] = 1
+
+                # Rule #2: One cell alive, dies if it has less than 2 alive
+                # neighbors (loneliness) or if it has more than 3 alive neighbors
+                # (overpopulation)
+                elif game_state[x, y] == 1 and (n_neigh < 2 or n_neigh > 3):
+                    new_game_state[x, y] = 0
 
             # Creates the polygon of every drawing cell
             poly = [(x*dim_x, y*dim_y),
