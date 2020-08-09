@@ -21,6 +21,24 @@ dim_y = height/cells_y
 # Matrix for keeping the state of the game. Alive=1, death=0.
 game_state = np.zeros((cells_x, cells_y))
 
+# Stick
+# 0 1 0
+# 0 1 0
+# 0 1 0
+game_state[5, 3] = 1
+game_state[5, 4] = 1
+game_state[5, 5] = 1
+
+# Movement
+# 0 1 0
+# 0 0 1
+# 1 1 1
+# game_state[21, 21] = 1
+# game_state[22, 22] = 1
+# game_state[22, 23] = 1
+# game_state[21, 23] = 1
+# game_state[20, 23] = 1
+
 # Execution loop
 while True:
     # Reinitializing screen and game state in every iteration
