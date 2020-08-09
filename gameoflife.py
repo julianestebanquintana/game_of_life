@@ -23,8 +23,10 @@ game_state = np.zeros((cells_x, cells_y))
 
 # Execution loop
 while True:
-
+    # Reinitializing screen and game state in every iteration
     new_game_state = np.copy(game_state)
+    screen.fill(background)
+    time.sleep(0.1)
 
     for y in range(0, cells_x):
         for x in range(0, cells_y):
@@ -49,7 +51,7 @@ while True:
             # neighbors (loneliness) or if it has more than 3 alive neighbors
             # (overpopulation)
             elif game_state[x, y] == 1 and (n_neigh < 2 or n_neigh > 3):
-               new_game_state[x, y] = 0
+                new_game_state[x, y] = 0
 
             # Creates the polygon of every drawing cell
             poly = [(x*dim_x, y*dim_y),
