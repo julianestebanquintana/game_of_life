@@ -1,4 +1,5 @@
 import time
+import sys
 import pygame
 import numpy as np
 
@@ -33,15 +34,20 @@ while True:
 
     # Registering keyboard and mouse events
     ev = pygame.event.get()
-
     for event in ev:
+        if event.type == pygame.QUIT:
+            sys.exit()
         if event.type == pygame.KEYDOWN:
             pause_exec = not pause_exec
+        mouse_click = pygame.mouse.get_pressed()
+        if sum(mouse_click) > 0:
+            posX, posY = pygame.mouse.get_pos()
+            celX, celY = int(np.floor(posX/dim_x)), int(np.floor(posY/dim_y))
+            new_game_state[celX, celY] = not mouse_click[2]
 
-
+    # Calculating game state
     for y in range(0, cells_x):
         for x in range(0, cells_y):
-
             if not pause_exec:
 
                 # Calculating close neighbors
@@ -56,13 +62,15 @@ while True:
                         + game_state[(x + 1) % cells_x, (y + 1) % cells_y]
                     )
 
-                # Rule #1: One death cell with 3 alive neighbors, gets back to life
+                # Original Horton's Rules:
+                # Rule #1: One death cell with 3 alive neighbors
+                # gets back to life
                 if game_state[x, y] == 0 and n_neigh == 3:
                     new_game_state[x, y] = 1
 
                 # Rule #2: One cell alive, dies if it has less than 2 alive
-                # neighbors (loneliness) or if it has more than 3 alive neighbors
-                # (overpopulation)
+                # neighbors (loneliness) or if it has more than 3 alive
+                # neighbors (overpopulation)
                 elif game_state[x, y] == 1 and (n_neigh < 2 or n_neigh > 3):
                     new_game_state[x, y] = 0
 
@@ -76,7 +84,7 @@ while True:
             if new_game_state[x, y] == 0:
                 pygame.draw.polygon(screen, (128, 128, 128), poly, 1)
             else:
-                pygame.draw.polygon(screen, (256, 256, 256), poly, 0)
+                pygame.draw.polygon(screen, (255, 255, 255), poly, 0)
 
     # Updating the state of the game
     game_state = np.copy(new_game_state)
